@@ -1,4 +1,18 @@
+# app.py
 import streamlit as st
+from io import StringIO
+import sys
+
+def capture_stdout(func):
+    old_stdout = sys.stdout
+    new_stdout = StringIO()
+    sys.stdout = new_stdout
+
+    try:
+        func()
+        return new_stdout.getvalue()
+    finally:
+        sys.stdout = old_stdout
 
 def main():
     st.title("Python Compiler")
@@ -8,10 +22,12 @@ def main():
 
     # Display output
     if st.button("Run Code"):
-        # You would normally send the code to a backend, but for simplicity, we'll just display it here
+        # Capture the output of the code
+        output = capture_stdout(lambda: exec(code))
+        
+        # Display the captured output
         st.markdown("### Output:")
-        exec_output = eval(code)
-        st.code(str(exec_output))
+        st.code(output)
 
 if __name__ == "__main__":
     main()
