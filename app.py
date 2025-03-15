@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 from io import StringIO
 import sys
@@ -16,11 +15,14 @@ def capture_stdout(func):
         sys.stdout = old_stdout
 
 def execute_code(user_code):
-    input_values = ["10", "20"]  # Predefined inputs (modify as needed)
-    input_generator = (val for val in input_values)  # Create an iterator
+    input_values = ["10", "20"]  # Predefined inputs
+    input_generator = iter(input_values)  # Convert to an iterator
+
+    def mock_input(prompt=""):
+        return next(input_generator)  # Return the next predefined input
 
     try:
-        with patch("builtins.input", lambda: next(input_generator)):  # Mock input()
+        with patch("builtins.input", mock_input):  # Use the function
             return capture_stdout(lambda: exec(user_code, {}))
     except Exception as e:
         return str(e)
