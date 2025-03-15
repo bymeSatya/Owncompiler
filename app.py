@@ -14,6 +14,16 @@ def capture_stdout(func):
     finally:
         sys.stdout = old_stdout
 
+def execute_code(user_code):
+    try:
+        # Replace `input()` calls with a predefined value (e.g., "10")
+        user_code = user_code.replace("input(", '"10" # input(')
+        exec(user_code, {})
+    except Exception as e:
+        return str(e)
+
+    return capture_stdout(lambda: exec(user_code, {}))
+
 def main():
     st.title("Python Compiler")
 
@@ -22,8 +32,7 @@ def main():
 
     # Display output
     if st.button("Run Code"):
-        # Capture the output of the code
-        output = capture_stdout(lambda: exec(code))
+        output = execute_code(code)
         
         # Display the captured output
         st.markdown("### Output:")
