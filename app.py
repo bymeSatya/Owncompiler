@@ -2,6 +2,7 @@
 import streamlit as st
 from io import StringIO
 import sys
+from unittest.mock import patch
 
 def capture_stdout(func):
     old_stdout = sys.stdout
@@ -15,14 +16,14 @@ def capture_stdout(func):
         sys.stdout = old_stdout
 
 def execute_code(user_code):
+    input_values = ["10", "20"]  # Predefined inputs (modify as needed)
+    input_generator = (val for val in input_values)  # Create an iterator
+
     try:
-        # Replace `input()` calls with a predefined value (e.g., "10")
-        user_code = user_code.replace("input(", '"10" # input(')
-        exec(user_code, {})
+        with patch("builtins.input", lambda: next(input_generator)):  # Mock input()
+            return capture_stdout(lambda: exec(user_code, {}))
     except Exception as e:
         return str(e)
-
-    return capture_stdout(lambda: exec(user_code, {}))
 
 def main():
     st.title("Python Compiler")
